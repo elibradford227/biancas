@@ -43,4 +43,43 @@ public class WorkOrderController : ControllerBase
     _dbContext.SaveChanges();
     return Created($"/api/workorder/{workOrder.Id}", workOrder);
   }
+
+  [HttpPut("{id}")]
+  [Authorize]
+  public IActionResult UpdateWorkOrder(WorkOrder workOrder, int id)
+  {
+    WorkOrder workOrderToUpdate = _dbContext.WorkOrders.SingleOrDefault(wo => wo.Id == id);
+    if (workOrderToUpdate == null)
+    {
+      return NotFound();
+    }
+    else if (id != workOrder.Id)
+    {
+      return BadRequest();
+    }
+
+    workOrderToUpdate.Description = workOrder.Description;
+    workOrderToUpdate.UserProfileId = workOrder.UserProfileId;
+    workOrderToUpdate.BikeId = workOrder.BikeId;
+
+    _dbContext.SaveChanges();
+    
+    return NoContent();
+  }
+
+  [HttpDelete("{id}")]
+  [Authorize]
+  public IActionResult DeleteWorkOrder(int id)
+  {
+    WorkOrder workOrderToDelete = _dbContext.WorkOrders.SingleOrDefault(wo => wo.Id == id);
+
+    if (workOrderToDelete == null)
+    {
+      return NotFound();
+    }
+
+    _dbContext.WorkOrders.Remove(workOrderToDelete);
+    _dbContext.SaveChanges();
+    return NoContent();
+  }
 }
